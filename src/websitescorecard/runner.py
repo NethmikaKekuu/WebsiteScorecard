@@ -9,6 +9,7 @@ from pathlib import Path
 from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn, TimeElapsedColumn
 
 from websitescorecard.checks.base import Check
+from websitescorecard.checks.footer_vendor import FooterVendorCheck, SCRAPE_URL_COLUMN
 from websitescorecard.csv_io import read_csv, write_csv
 
 
@@ -31,11 +32,16 @@ def _output_columns(original: list[str], checks: list[Check], include_errors: bo
     return columns
 
 
-def _run_checks_for_row(url: str, checks: list[Check]) -> dict[str, str]:
+def _run_checks_for_row(url: str, checks: list[Check], row: dict[str, str]) -> dict[str, str]:
     results: dict[str, str] = {}
     for check in checks:
         try:
-            result = check.run(url)
+            if isinstance(check, FooterVendorCheck):
+                scrape_url = row.get(SCRAPE_URL_COLUMN, "") or None
+                result = check.run(url, scrape_url=scrape_url)
+            else:
+                result = check.run(url)
+
             results[check.column] = result.status
             if check.error_column:
                 results[check.error_column] = result.error or ""
@@ -48,7 +54,7 @@ def _run_checks_for_row(url: str, checks: list[Check]) -> dict[str, str]:
 
 def _scan_row(index: int, row: dict[str, str], url_column: str, checks: list[Check]) -> tuple[int, dict[str, str]]:
     url = row.get(url_column, "")
-    check_results = _run_checks_for_row(url, checks)
+    check_results = _run_checks_for_row(url, checks, row)
     enriched = {**row, **check_results}
     return index, enriched
 

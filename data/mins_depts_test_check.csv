@@ -1,0 +1,50 @@
+Type,Institution Name,URL,Scrape_URL
+Ministry,Ministry of Defence,defence.lk,
+Ministry,"Ministry of Finance, Planning and Economic Development",treasury.gov.lk,
+Ministry,Ministry of Digital Economy,midec.gov.lk,
+Ministry,"Ministry of Foreign Affairs, Foreign Employment and Tourism",mfa.gov.lk,https://www.mfa.gov.lk/en
+Ministry,"Ministry of Education, Higher Education and Vocational Education",moe.gov.lk,https://moe.gov.lk/en/
+Ministry,"Ministry of Agriculture, Livestock, Land and Irrigation",agrimin.gov.lk,
+Ministry,"Ministry of Transport, Highways and Urban Development",transport.gov.lk,https://transport.gov.lk/web/index.php?lang=en
+Ministry,"Ministry of Public Administration, Provincial Councils and Local Government",pubad.gov.lk,https://pubad.gov.lk/web/index.php?lang=en
+Ministry,Ministry of Health and Mass Media,health.gov.lk,https://www.health.gov.lk/home/
+Ministry,Ministry of Justice and National Integration,moj.gov.lk,
+Ministry,Ministry of Public Security and Parliamentary Affairs,pubsec.gov.lk,
+Ministry,Ministry of Industry and Entrepreneurship Development,industry.gov.lk,https://www.industry.gov.lk/web/
+Ministry,"Ministry of Trade, Commerce, Food Security and Cooperative Development",ment.gov.lk,
+Ministry,Ministry of Environment,env.gov.lk,https://env.gov.lk/web/index.php?lang=en
+Ministry,Ministry of Energy,energy.gov.lk,
+Ministry,"Ministry of Housing, Construction and Water Supply",housingmin.gov.lk,
+Ministry,Ministry of Labor,labourmin.gov.lk,
+Ministry,Ministry of Plantation and Community Infrastructure,plantationindustries.gov.lk,
+Ministry,Ministry of Ports and Civil Aviation,portaviation.gov.lk,
+Ministry,"Ministry of Fisheries, Aquatic and Ocean Resources",fisheries.gov.lk,
+Ministry,Ministry of Women and Child Affairs,childwomen.gov.lk,
+Ministry,"Ministry of Rural Development, Social Security and Community Empowerment",socialservices.gov.lk,https://socialservices.gov.lk/web/index.php?lang=en
+Ministry,"Ministry of Buddhasasana, Religious and Cultural Affairs",mbra.gov.lk,
+Ministry,Ministry of Youth Affairs and Sports,sportsmin.gov.lk,
+Ministry,Ministry of Science and Technology,most.gov.lk,https://most.gov.lk/web/index.php?lang=en
+Department,Department of Immigration and Emigration,immigration.gov.lk,https://immigration.gov.lk/index_e.php
+Department,Department of Motor Traffic,dmt.gov.lk,
+Department,Department of Registration of Persons,drp.gov.lk,https://drp.gov.lk/en/home.php
+Department,Department of Registrar General,rgd.gov.lk,https://rgd.gov.lk/web/index.php?lang=en
+Department,Department of Inland Revenue,ird.gov.lk,
+Department,Sri Lanka Customs,customs.gov.lk,
+Department,Department of Pensions,pensions.gov.lk,
+Department,Department of Census and Statistics,statistics.gov.lk,
+Department,Department of Government Information,dgi.gov.lk,
+Department,Department of Government Printing,documents.gov.lk,
+Department,Department of Excise,excise.gov.lk,
+Department,Department of National Budget,nationalbudget.gov.lk,
+Department,Department of Meteorology,meteo.gov.lk,
+Department,Department of Wildlife Conservation,dwc.gov.lk,
+Department,Department of Forest Conservation,forestdept.gov.lk,
+Department,Department of National Zoological Gardens,colombozoo.gov.lk,
+Department,Department of Examinations,doenets.lk,
+Department,Department of Archaeology,archaeology.gov.lk,
+Department,Department of Samurdhi,samurdhi.gov.lk,https://samurdhi.gov.lk/web/index.php?lang=en
+Department,LSF,opensource.lk,
+Expired,Expired SSL,expired.badssl.com,
+Self-Signed,Self-Signed SSL,self-signed.badssl.com,
+Wrong Host,Wrong Host SSL,wrong.host.badssl.com,
+Never SSL,Never SSL,neverssl.com,

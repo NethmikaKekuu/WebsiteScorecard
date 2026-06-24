@@ -8,17 +8,17 @@ Ministry,"Ministry of Agriculture, Livestock, Land and Irrigation",agrimin.gov.l
 Ministry,"Ministry of Transport, Highways and Urban Development",transport.gov.lk,valid,,unknown,
 Ministry,"Ministry of Public Administration, Provincial Councils and Local Government",pubad.gov.lk,valid,,unknown,
 Ministry,Ministry of Health and Mass Media,health.gov.lk,valid,,unknown,
-Ministry,Ministry of Justice and National Integration,moj.gov.lk,valid,,found,Procons Infotech. 44.9
+Ministry,Ministry of Justice and National Integration,moj.gov.lk,valid,,found,Procons Infotech
 Ministry,Ministry of Public Security and Parliamentary Affairs,pubsec.gov.lk,valid,,unknown,
 Ministry,Ministry of Industry and Entrepreneurship Development,industry.gov.lk,valid,,unknown,
 Ministry,"Ministry of Trade, Commerce, Food Security and Cooperative Development",ment.gov.lk,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
 Ministry,Ministry of Environment,env.gov.lk,valid,,unknown,
 Ministry,Ministry of Energy,energy.gov.lk,valid,,unknown,
 Ministry,"Ministry of Housing, Construction and Water Supply",housingmin.gov.lk,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,Ministry of Labor,labourmin.gov.lk,valid,,found,About
+Ministry,Ministry of Labor,labourmin.gov.lk,valid,,unknown,
 Ministry,Ministry of Plantation and Community Infrastructure,plantationindustries.gov.lk,invalid,"Hostname mismatch, certificate is not valid for 'plantationindustries.gov.lk'.",found,University of Kelaniya
 Ministry,Ministry of Ports and Civil Aviation,portaviation.gov.lk,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,"Ministry of Fisheries, Aquatic and Ocean Resources",fisheries.gov.lk,unreachable,[WinError 10061] No connection could be made because the target machine actively refused it,self_built,IT UNIT Last Update
+Ministry,"Ministry of Fisheries, Aquatic and Ocean Resources",fisheries.gov.lk,valid,,self_built,IT UNIT Last Update
 Ministry,Ministry of Women and Child Affairs,childwomen.gov.lk,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
 Ministry,"Ministry of Rural Development, Social Security and Community Empowerment",socialservices.gov.lk,valid,,unknown,
 Ministry,"Ministry of Buddhasasana, Religious and Cultural Affairs",mbra.gov.lk,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
@@ -38,13 +38,13 @@ Department,Department of Excise,excise.gov.lk,valid,,found,LankaCom
 Department,Department of National Budget,nationalbudget.gov.lk,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
 Department,Department of Meteorology,meteo.gov.lk,valid,,unknown,
 Department,Department of Wildlife Conservation,dwc.gov.lk,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Department,Department of Forest Conservation,forestdept.gov.lk,expired,certificate has expired,found,ICTA & Procons Infotech
+Department,Department of Forest Conservation,forestdept.gov.lk,expired,certificate has expired,found,icta.lk & Procons Infotech
 Department,Department of National Zoological Gardens,colombozoo.gov.lk,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
 Department,Department of Examinations,doenets.lk,valid,,unknown,
 Department,Department of Archaeology,archaeology.gov.lk,valid,,found,University of Kelaniya
 Department,Department of Samurdhi,samurdhi.gov.lk,valid,,unknown,
 Department,LSF,opensource.lk,valid,,unknown,
-Expired,Expired SSL,expired.badssl.com,unreachable,Connection timed out,unknown,
+Expired,Expired SSL,expired.badssl.com,expired,certificate has expired,unknown,
 Self-Signed,Self-Signed SSL,self-signed.badssl.com,invalid,self-signed certificate,unknown,
 Wrong Host,Wrong Host SSL,wrong.host.badssl.com,invalid,"Hostname mismatch, certificate is not valid for 'wrong.host.badssl.com'.",unknown,
-Never SSL,Never SSL,neverssl.com,valid,,unknown,
+Never SSL,Never SSL,neverssl.com,valid,,unreachable,Failed to fetch page
