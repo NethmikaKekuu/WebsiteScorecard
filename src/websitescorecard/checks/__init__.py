@@ -6,11 +6,13 @@ from typing import Callable
 
 from websitescorecard.checks.base import Check
 from websitescorecard.checks.ssl import SSLCheck
+from websitescorecard.checks.footer_vendor import FooterVendorCheck
 
 CheckFactory = Callable[[], Check]
 
 CHECK_REGISTRY: dict[str, CheckFactory] = {
     "ssl": SSLCheck,
+    "footer_vendor": FooterVendorCheck,
 }
 
 
