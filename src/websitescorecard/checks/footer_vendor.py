@@ -1,43 +1,34 @@
 """Footer vendor/developer credit check.
 
-Scrapes the footer of a webpage and attempts to identify who built it —
-typically a web agency or technology vendor credited in small print.
-
 Extraction strategy
 -------------------
-1. Fetch the page over HTTPS (falls back to HTTP).
-2. Parse the first ``<footer>`` element; if none exists, fall back to the
-   last 20 % of the raw ``<body>`` text where footer-like content usually
-   lives on older gov sites.
-3. Run a ranked set of regex patterns against that text:
-   - Explicit credit phrases  ("Designed by", "Developed by", …)
-   - "Powered by <Name>"
-   - Copyright line with a company name
-4. Return the first match as the vendor name, or "unknown" if nothing fires.
+1. Fetch the page (HTTPS first, HTTP fallback).
+2. Find the footer region — <footer> tag, or any element whose id/class
+   contains "footer"/"bottom"/"copyright"/"credit", or last 20% of <body>.
+3. PRIMARY: scan footer HTML for <a> tags near credit trigger phrases.
+   - If <a> has visible text  → use that as the vendor name.
+   - If <a> has only an image → extract the domain from href as vendor name.
+4. FALLBACK: extended regex against plain footer text for un-hyperlinked names.
+5. COPYRIGHT FALLBACK: if the © line links to an external domain that is NOT
+   the institution's own domain, treat the link text / href domain as vendor.
+6. Self-built detection: ICT Directorate / IT Unit etc. → status "self_built".
+7. Multiple vendors joined with " & ".
 
 Result statuses
 ---------------
-``found``       – a vendor name was extracted (stored in ``footer_vendor``).
-``unknown``     – page loaded but no credit pattern matched.
-``unreachable`` – the page could not be fetched (network / HTTP error).
-``error``       – unexpected exception during parsing.
+``found``       – external vendor name(s) in footer_vendor_error column.
+``self_built``  – built by the institution's own IT unit.
+``unknown``     – page loaded but no credit found.
+``unreachable`` – page could not be fetched.
 """
 
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
+from urllib.parse import urlparse
 
 from websitescorecard.checks.base import CheckResult
 from websitescorecard.url_utils import parse_url
-
-if TYPE_CHECKING:
-    pass
-
-# ---------------------------------------------------------------------------
-# Optional dependencies – httpx + BeautifulSoup are not part of the base
-# install, so we import lazily and surface a clear error if missing.
-# ---------------------------------------------------------------------------
 
 _MISSING_DEPS: list[str] = []
 
@@ -47,68 +38,89 @@ except ImportError:
     _MISSING_DEPS.append("httpx")
 
 try:
-    from bs4 import BeautifulSoup
+    from bs4 import BeautifulSoup, Tag
 except ImportError:
     _MISSING_DEPS.append("beautifulsoup4")
 
 # ---------------------------------------------------------------------------
-# Credit-line patterns (tried in order; first match wins)
+# Credit trigger phrases
 # ---------------------------------------------------------------------------
 
-# Capture group 1 must contain the vendor name.
-_CREDIT_PATTERNS: list[re.Pattern[str]] = [
-    # "Designed / Developed / Built / Created / Maintained by <Name>"
+_CREDIT_TRIGGERS = re.compile(
+    r"(?:"
+    r"designed\s*(?:&amp;|&|and)?\s*developed\s+by"
+    r"|developed\s+(?:in\s+association\s+with|by)"
+    r"|concept[,\s]+design\s*(?:&amp;|&|and)?\s*development\s+by"
+    r"|designed\s+by"
+    r"|developed\s+by"
+    r"|built\s+by"
+    r"|created\s+by"
+    r"|maintained\s+by"
+    r"|managed\s+by"
+    r"|powered\s+by"
+    r"|hosted\s+by"
+    r"|website\s+by"
+    r"|solution\s+by:?"
+    r")",
+    re.IGNORECASE,
+)
+
+# Plain-text fallback (capture group 1 = vendor name).
+_TEXT_PATTERNS: list[re.Pattern[str]] = [
     re.compile(
-        r"(?:designed|developed|built|created|maintained|managed)\s+by\s+([A-Za-z0-9 &()\-\.]{2,60})",
+        r"(?:designed\s*(?:&|and)?\s*developed|developed|designed|built"
+        r"|created|maintained|managed|powered|hosted|website)"
+        r"\s+(?:in\s+association\s+with\s+|by\s+)"
+        r"([A-Za-z0-9][A-Za-z0-9 &()\-\.]{1,60})",
         re.IGNORECASE,
     ),
-    # "Powered by <Name>"
     re.compile(
-        r"powered\s+by\s+([A-Za-z0-9 &()\-\.]{2,60})",
+        r"concept[,\s]+design\s*(?:&|and)?\s*development\s+by\s+"
+        r"([A-Za-z0-9][A-Za-z0-9 &()\-\.]{1,60})",
         re.IGNORECASE,
     ),
-    # "A <Name> website" / "A <Name> product"
     re.compile(
-        r"\ba\s+([A-Za-z0-9 &()\-\.]{2,40})\s+(?:website|product|solution|platform)\b",
-        re.IGNORECASE,
-    ),
-    # Copyright line: © 2024 <CompanyName>  (skip generic gov phrases)
-    re.compile(
-        r"©\s*\d{4}(?:\s*[-–]\s*\d{4})?\s+([A-Za-z][A-Za-z0-9 &()\-\.]{2,60})",
+        r"solution\s+by:?\s*([A-Za-z0-9][A-Za-z0-9 &()\-\.]{1,60})",
         re.IGNORECASE,
     ),
 ]
 
-# Noise phrases that look like credits but are not vendor names.
-_NOISE_PHRASES: frozenset[str] = frozenset(
-    {
-        "government of sri lanka",
-        "all rights reserved",
-        "the government",
-        "sri lanka",
-        "republic of",
-        "ministry",
-        "department",
-        "best viewed",
-        "this website",
-        "official website",
-        "last updated",
-        "site map",
-    }
+# Self-built: vendor is the institution's own IT unit.
+_SELF_BUILT = re.compile(
+    r"\b(?:ict\s+(?:directorate|unit|division|branch|centre|center)"
+    r"|it\s+(?:division|unit|department)"
+    r"|mis\s+(?:unit|division)"
+    r"|information\s+(?:technology|systems)\s+(?:unit|division|department))\b",
+    re.IGNORECASE,
 )
 
-# Fraction of body text considered "footer region" when no <footer> tag found.
+# Footer-like id/class substrings.
+_FOOTER_ATTR = re.compile(r"footer|bottom|copyright|credit", re.IGNORECASE)
+
+# Noise phrases — not vendor names.
+_NOISE: frozenset[str] = frozenset({
+    "government of sri lanka",
+    "all rights reserved",
+    "the government",
+    "sri lanka",
+    "republic of",
+    "ministry",
+    "department",
+    "best viewed",
+    "this website",
+    "official website",
+    "last updated",
+    "site map",
+    "privacy policy",
+    "terms",
+    "contact",
+})
+
 _FOOTER_FRACTION = 0.20
+_MAX_CHARS = 6_000
 
-# How many characters of footer text to scan (keeps regex fast).
-_MAX_FOOTER_CHARS = 4_000
-
-# HTTP headers that make the request look like a real browser.
 _HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (compatible; WebsiteScorecard/1.0; "
-        "+https://github.com/your-org/websitescorecard)"
-    ),
+    "User-Agent": "Mozilla/5.0 (compatible; WebsiteScorecard/1.0)",
     "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
 }
@@ -144,34 +156,36 @@ class FooterVendorCheck:
         if html is None:
             return CheckResult(status="unreachable", error="Failed to fetch page")
 
-        footer_text = _extract_footer_text(html)
-        vendor = _find_vendor(footer_text)
+        soup = BeautifulSoup(html, "html.parser")
+        for tag in soup(["script", "style", "noscript"]):
+            tag.decompose()
 
-        if vendor:
-            return CheckResult(status="found", error=vendor)  # vendor stored in error_column
-        return CheckResult(status="unknown", error=None)
+        footer_el = _find_footer_element(soup)
+        vendors = _extract_vendors(footer_el, soup, site_domain=parsed.hostname)
 
-    # ------------------------------------------------------------------
+        if not vendors:
+            return CheckResult(status="unknown", error=None)
+
+        combined = " & ".join(vendors)
+        if _SELF_BUILT.search(combined):
+            return CheckResult(status="self_built", error=combined)
+
+        return CheckResult(status="found", error=combined)
 
     def _fetch(self, hostname: str, port: int, original_url: str) -> str | None:
-        """Try HTTPS then HTTP; return raw HTML or None."""
-        # Build candidate URLs – prefer the original as-is, then try scheme swap.
-        candidates = _candidate_urls(original_url, hostname, port)
-
-        for candidate in candidates:
+        for candidate in _candidate_urls(original_url):
             try:
                 with httpx.Client(
                     timeout=self.timeout,
                     headers=_HEADERS,
                     follow_redirects=True,
-                    verify=False,  # noqa: S501 – SSL validity is checked separately
+                    verify=False,  # noqa: S501
                 ) as client:
-                    response = client.get(candidate)
-                    if response.status_code < 400:
-                        return response.text
+                    r = client.get(candidate)
+                    if r.status_code < 400:
+                        return r.text
             except (httpx.RequestError, httpx.HTTPStatusError):
                 continue
-
         return None
 
 
@@ -180,58 +194,140 @@ class FooterVendorCheck:
 # ---------------------------------------------------------------------------
 
 
-def _candidate_urls(original_url: str, hostname: str, port: int) -> list[str]:
-    """Return URLs to try, starting with the most likely."""
-    raw = original_url.strip()
+def _candidate_urls(url: str) -> list[str]:
+    raw = url.strip()
     if "://" not in raw:
         return [f"https://{raw}", f"http://{raw}"]
-
-    # Already has a scheme – also try the opposite.
     if raw.startswith("https://"):
         return [raw, raw.replace("https://", "http://", 1)]
     return [raw, raw.replace("http://", "https://", 1)]
 
 
-def _extract_footer_text(html: str) -> str:
-    """Return condensed text from the footer region of the page."""
-    soup = BeautifulSoup(html, "html.parser")
-
-    # Remove script/style noise first.
-    for tag in soup(["script", "style", "noscript"]):
-        tag.decompose()
-
-    footer = soup.find("footer")
-    if footer:
-        return footer.get_text(separator=" ", strip=True)[:_MAX_FOOTER_CHARS]
-
-    # Fallback: bottom fraction of body text.
-    body = soup.find("body")
-    if body:
-        text = body.get_text(separator=" ", strip=True)
-        start = max(0, int(len(text) * (1 - _FOOTER_FRACTION)))
-        return text[start:][:_MAX_FOOTER_CHARS]
-
-    return html[-_MAX_FOOTER_CHARS:]
+def _find_footer_element(soup: "BeautifulSoup") -> "Tag | None":
+    el = soup.find("footer")
+    if el:
+        return el
+    for el in soup.find_all(True):
+        el_id = el.get("id", "")
+        el_class = " ".join(el.get("class", []))
+        if _FOOTER_ATTR.search(el_id) or _FOOTER_ATTR.search(el_class):
+            return el
+    return None
 
 
-def _find_vendor(text: str) -> str | None:
-    """Run ranked patterns against footer text; return first clean match."""
-    for pattern in _CREDIT_PATTERNS:
-        m = pattern.search(text)
-        if not m:
-            continue
+def _extract_vendors(
+    footer_el: "Tag | None",
+    soup: "BeautifulSoup",
+    site_domain: str,
+) -> list[str]:
+    vendors: list[str] = []
 
-        candidate = m.group(1).strip().rstrip(".,;:")
-        if _is_noise(candidate):
-            continue
+    if footer_el:
+        vendors = _vendors_from_links(footer_el, site_domain)
+        if not vendors:
+            text = footer_el.get_text(separator=" ", strip=True)[:_MAX_CHARS]
+            vendors = _vendors_from_text(text)
+        if not vendors:
+            vendors = _vendors_from_copyright_links(footer_el, site_domain)
 
-        return candidate
+    # Body fallback
+    if not vendors:
+        body = soup.find("body")
+        if body:
+            full = body.get_text(separator=" ", strip=True)
+            start = max(0, int(len(full) * (1 - _FOOTER_FRACTION)))
+            vendors = _vendors_from_text(full[start:][:_MAX_CHARS])
+
+    return vendors
+
+
+def _link_name(a_tag: "Tag", site_domain: str) -> str | None:
+    """
+    Extract a vendor name from an <a> tag.
+    - Prefers visible link text.
+    - Falls back to the href domain if the link only wraps an image.
+    Returns None if the result is noise or points back to the site itself.
+    """
+    text = a_tag.get_text(strip=True)
+
+    if text and not _is_noise(text):
+        return text
+
+    # Image-only link — use the href domain as the name.
+    href = a_tag.get("href", "")
+    if href:
+        try:
+            domain = urlparse(href).netloc.lstrip("www.")
+            # Skip if it's the site's own domain or clearly internal.
+            if domain and site_domain not in domain and domain not in site_domain:
+                return domain
+        except Exception:
+            pass
 
     return None
 
 
-def _is_noise(candidate: str) -> bool:
-    lower = candidate.lower()
+def _vendors_from_links(container: "Tag", site_domain: str) -> list[str]:
+    """Find <a> tags that follow a credit trigger phrase in the HTML."""
+    vendors: list[str] = []
+    html_str = str(container)
+
+    for m in _CREDIT_TRIGGERS.finditer(html_str):
+        snippet = html_str[m.end(): m.end() + 400]
+        mini = BeautifulSoup(snippet, "html.parser")
+        for a in mini.find_all("a"):
+            name = _link_name(a, site_domain)
+            if name and name not in vendors:
+                vendors.append(name)
+
+    return vendors
+
+
+def _vendors_from_copyright_links(container: "Tag", site_domain: str) -> list[str]:
+    """
+    Last resort: find © lines that contain an external <a> tag.
+    e.g. "Copyright © 2026 <a href='https://onzdev.com'>Ones and Zeros</a>"
+    Only fires when the linked domain is NOT the site's own domain.
+    """
+    vendors: list[str] = []
+    html_str = str(container)
+
+    # Find blocks containing a copyright symbol.
+    copyright_re = re.compile(r"©.*?(?=©|$)", re.IGNORECASE | re.DOTALL)
+    for block_m in copyright_re.finditer(html_str):
+        block = block_m.group(0)[:600]
+        mini = BeautifulSoup(block, "html.parser")
+        for a in mini.find_all("a"):
+            href = a.get("href", "")
+            if not href:
+                continue
+            try:
+                domain = urlparse(href).netloc.lstrip("www.")
+            except Exception:
+                continue
+            # Skip internal / same-domain links
+            if not domain or site_domain in domain or domain in site_domain:
+                continue
+            name = _link_name(a, site_domain)
+            if name and not _is_noise(name) and name not in vendors:
+                vendors.append(name)
+
+    return vendors
+
+
+def _vendors_from_text(text: str) -> list[str]:
+    vendors: list[str] = []
+    for pattern in _TEXT_PATTERNS:
+        for m in pattern.finditer(text):
+            candidate = m.group(1).strip().rstrip(".,;:|")
+            candidate = re.split(r"\s{2,}|\|", candidate)[0].strip()
+            if candidate and not _is_noise(candidate) and candidate not in vendors:
+                vendors.append(candidate)
+    return vendors
+
+
+def _is_noise(s: str) -> bool:
+    lower = s.lower().strip()
     if len(lower) < 3:
         return True
-    return any(noise in lower for noise in _NOISE_PHRASES)
+    return any(noise in lower for noise in _NOISE)
