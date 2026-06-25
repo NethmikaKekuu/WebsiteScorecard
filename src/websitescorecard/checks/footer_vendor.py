@@ -107,10 +107,7 @@ _NAV_WORDS: frozenset[str] = frozenset({
 })
 
 _BLOCKED_DOMAINS: frozenset[str] = frozenset({
-    "gnu.org",
-    "opensource.org",
-    "w3.org",
-    "creativecommons.org",
+   
 })
 
 _FOOTER_FRACTION = 0.20
@@ -149,12 +146,16 @@ class FooterVendorCheck:
         fetch_targets: list[str] = []
         if scrape_url and scrape_url.strip():
             fetch_targets.append(scrape_url.strip())
-        fetch_targets.append(url)
+        normalized_url = url.strip()
+        if normalized_url not in fetch_targets:
+            fetch_targets.append(normalized_url)
 
+        any_reachable = False
         for target in fetch_targets:
             html = self._fetch(target)
             if html is None:
                 continue
+            any_reachable = True
 
             soup = BeautifulSoup(html, "html.parser")
             for tag in soup(["script", "style", "noscript"]):
@@ -169,26 +170,28 @@ class FooterVendorCheck:
                     return CheckResult(status="self_built", error=combined)
                 return CheckResult(status="found", error=combined)
 
-        any_reachable = any(self._fetch(t) is not None for t in fetch_targets)
         if not any_reachable:
             return CheckResult(status="unreachable", error="Failed to fetch page")
 
         return CheckResult(status="unknown", error=None)
 
     def _fetch(self, url: str) -> str | None:
-        for candidate in _candidate_urls(url):
-            try:
-                with httpx.Client(
-                    timeout=self.timeout,
-                    headers=_HEADERS,
-                    follow_redirects=True,
-                    verify=False,  # noqa: S501
-                ) as client:
-                    r = client.get(candidate)
-                    if r.status_code < 400:
-                        return r.text
-            except (httpx.RequestError, httpx.HTTPStatusError):
-                continue
+        try:
+            with httpx.Client(
+                timeout=self.timeout,
+                headers=_HEADERS,
+                follow_redirects=True,
+                verify=False,  # noqa: S501
+            ) as client:
+                for candidate in _candidate_urls(url):
+                    try:
+                        r = client.get(candidate)
+                        if r.status_code < 400:
+                            return r.text
+                    except (httpx.RequestError, httpx.HTTPStatusError):
+                        continue
+        except httpx.RequestError:
+            pass
         return None
 
 
@@ -205,12 +208,13 @@ def _find_footer_element(soup: "BeautifulSoup") -> "Tag | None":
     el = soup.find("footer")
     if el:
         return el
-    for el in soup.find_all(True):
-        el_id = el.get("id", "")
-        el_class = " ".join(el.get("class", []))
-        if _FOOTER_ATTR.search(el_id) or _FOOTER_ATTR.search(el_class):
-            return el
-    return None
+    el = soup.find(lambda tag: (
+        (tag.get("id") and _FOOTER_ATTR.search(tag.get("id"))) or
+        (tag.get("class") and _FOOTER_ATTR.search(
+            " ".join(tag.get("class") if isinstance(tag.get("class"), list) else [tag.get("class")])
+        ))
+    ))
+    return el or None
 
 
 def _extract_vendors(
@@ -265,14 +269,19 @@ def _link_name(a_tag: "Tag", site_domain: str) -> str | None:
 
 def _vendors_from_links(container: "Tag", site_domain: str) -> list[str]:
     vendors: list[str] = []
-    html_str = str(container)
-    for m in _CREDIT_TRIGGERS.finditer(html_str):
-        snippet = html_str[m.end(): m.end() + 400]
-        mini = BeautifulSoup(snippet, "html.parser")
-        for a in mini.find_all("a"):
-            name = _link_name(a, site_domain)
-            if name and name not in vendors:
-                vendors.append(name)
+    for text_node in container.find_all(string=True):
+        if _CREDIT_TRIGGERS.search(text_node):
+            parent = text_node.parent
+            if parent:
+                if parent.name == "a":
+                    name = _link_name(parent, site_domain)
+                    if name and name not in vendors:
+                        vendors.append(name)
+                else:
+                    for a in parent.find_all("a"):
+                        name = _link_name(a, site_domain)
+                        if name and name not in vendors:
+                            vendors.append(name)
     return vendors
 
 
