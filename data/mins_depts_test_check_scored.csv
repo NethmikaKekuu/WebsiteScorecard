@@ -1,50 +1,50 @@
-Type,Institution Name,URL,Scrape_URL,ssl_status,ssl_error,footer_vendor,footer_vendor_error
-Ministry,Ministry of Defence,defence.lk,,valid,,unknown,
-Ministry,"Ministry of Finance, Planning and Economic Development",treasury.gov.lk,,valid,,found,elysiancrest.com
-Ministry,Ministry of Digital Economy,midec.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,"Ministry of Foreign Affairs, Foreign Employment and Tourism",mfa.gov.lk,https://www.mfa.gov.lk/en,valid,,found,Frontwalker
-Ministry,"Ministry of Education, Higher Education and Vocational Education",moe.gov.lk,https://moe.gov.lk/en/,valid,,unknown,
-Ministry,"Ministry of Agriculture, Livestock, Land and Irrigation",agrimin.gov.lk,,valid,,found,onzdev.com
-Ministry,"Ministry of Transport, Highways and Urban Development",transport.gov.lk,https://transport.gov.lk/web/index.php?lang=en,valid,,found,Procons Infotech
-Ministry,"Ministry of Public Administration, Provincial Councils and Local Government",pubad.gov.lk,https://pubad.gov.lk/web/index.php?lang=en,valid,,found,gnu.org
-Ministry,Ministry of Health and Mass Media,health.gov.lk,https://www.health.gov.lk/home/,valid,,found,Weblankan & Arrogance Technologies (Pvt)Ltd
-Ministry,Ministry of Justice and National Integration,moj.gov.lk,,valid,,found,Procons Infotech
-Ministry,Ministry of Public Security and Parliamentary Affairs,pubsec.gov.lk,,valid,,unknown,
-Ministry,Ministry of Industry and Entrepreneurship Development,industry.gov.lk,https://www.industry.gov.lk/web/,valid,,found,theekshana.lk
-Ministry,"Ministry of Trade, Commerce, Food Security and Cooperative Development",ment.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,Ministry of Environment,env.gov.lk,https://env.gov.lk/web/index.php?lang=en,valid,,found,Procons Infotech.
-Ministry,Ministry of Energy,energy.gov.lk,,valid,,unknown,
-Ministry,"Ministry of Housing, Construction and Water Supply",housingmin.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,Ministry of Labor,labourmin.gov.lk,,valid,,unknown,
-Ministry,Ministry of Plantation and Community Infrastructure,plantationindustries.gov.lk,,invalid,"Hostname mismatch, certificate is not valid for 'plantationindustries.gov.lk'.",found,University of Kelaniya
-Ministry,Ministry of Ports and Civil Aviation,portaviation.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,"Ministry of Fisheries, Aquatic and Ocean Resources",fisheries.gov.lk,,valid,,self_built,IT UNIT Last Update
-Ministry,Ministry of Women and Child Affairs,childwomen.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,"Ministry of Rural Development, Social Security and Community Empowerment",socialservices.gov.lk,https://socialservices.gov.lk/web/index.php?lang=en,valid,,found,Procons Infotech
-Ministry,"Ministry of Buddhasasana, Religious and Cultural Affairs",mbra.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,Ministry of Youth Affairs and Sports,sportsmin.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Ministry,Ministry of Science and Technology,most.gov.lk,https://most.gov.lk/web/index.php?lang=en,valid,,found,Procons Infotech
-Department,Department of Immigration and Emigration,immigration.gov.lk,https://immigration.gov.lk/index_e.php,valid,,found,SLT
-Department,Department of Motor Traffic,dmt.gov.lk,,valid,,found,Procons Infotech
-Department,Department of Registration of Persons,drp.gov.lk,https://drp.gov.lk/en/home.php,valid,,unknown,
-Department,Department of Registrar General,rgd.gov.lk,https://rgd.gov.lk/web/index.php?lang=en,valid,,unknown,
-Department,Department of Inland Revenue,ird.gov.lk,,valid,,unreachable,Failed to fetch page
-Department,Sri Lanka Customs,customs.gov.lk,,valid,,unknown,
-Department,Department of Pensions,pensions.gov.lk,,valid,,found,Procons Infotech
-Department,Department of Census and Statistics,statistics.gov.lk,,unreachable,[WinError 10054] An existing connection was forcibly closed by the remote host,unreachable,Failed to fetch page
-Department,Department of Government Information,dgi.gov.lk,,valid,,unknown,
-Department,Department of Government Printing,documents.gov.lk,,valid,,unknown,
-Department,Department of Excise,excise.gov.lk,,valid,,found,LankaCom
-Department,Department of National Budget,nationalbudget.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Department,Department of Meteorology,meteo.gov.lk,,valid,,unknown,
-Department,Department of Wildlife Conservation,dwc.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Department,Department of Forest Conservation,forestdept.gov.lk,,expired,certificate has expired,found,ICTA & Procons Infotech
-Department,Department of National Zoological Gardens,colombozoo.gov.lk,,unreachable,[Errno 11001] getaddrinfo failed,unreachable,Failed to fetch page
-Department,Department of Examinations,doenets.lk,,valid,,unknown,
-Department,Department of Archaeology,archaeology.gov.lk,,valid,,found,University of Kelaniya
-Department,Department of Samurdhi,samurdhi.gov.lk,https://samurdhi.gov.lk/web/index.php?lang=en,valid,,found,Information and Communication Technology Agency
-Department,LSF,opensource.lk,,valid,,unknown,
-Expired,Expired SSL,expired.badssl.com,,expired,certificate has expired,unknown,
-Self-Signed,Self-Signed SSL,self-signed.badssl.com,,invalid,self-signed certificate,unknown,
-Wrong Host,Wrong Host SSL,wrong.host.badssl.com,,invalid,"Hostname mismatch, certificate is not valid for 'wrong.host.badssl.com'.",unknown,
-Never SSL,Never SSL,neverssl.com,,valid,,unknown,
+Type,Institution Name,URL,Scrape_URL,footer_vendor,footer_vendor_error
+Ministry,Ministry of Defence,defence.lk,,unknown,
+Ministry,"Ministry of Finance, Planning and Economic Development",treasury.gov.lk,,found,elysiancrest.com
+Ministry,Ministry of Digital Economy,midec.gov.lk,,unreachable,Failed to fetch page
+Ministry,"Ministry of Foreign Affairs, Foreign Employment and Tourism",mfa.gov.lk,https://www.mfa.gov.lk/en,found,Frontwalker
+Ministry,"Ministry of Education, Higher Education and Vocational Education",moe.gov.lk,https://moe.gov.lk/en/,unknown,
+Ministry,"Ministry of Agriculture, Livestock, Land and Irrigation",agrimin.gov.lk,,found,onzdev.com
+Ministry,"Ministry of Transport, Highways and Urban Development",transport.gov.lk,https://transport.gov.lk/web/index.php?lang=en,found,Procons Infotech
+Ministry,"Ministry of Public Administration, Provincial Councils and Local Government",pubad.gov.lk,https://pubad.gov.lk/web/index.php?lang=en,found,gnu.org
+Ministry,Ministry of Health and Mass Media,health.gov.lk,https://www.health.gov.lk/home/,found,Weblankan & Arrogance Technologies (Pvt)Ltd
+Ministry,Ministry of Justice and National Integration,moj.gov.lk,,found,Procons Infotech
+Ministry,Ministry of Public Security and Parliamentary Affairs,pubsec.gov.lk,,unknown,
+Ministry,Ministry of Industry and Entrepreneurship Development,industry.gov.lk,https://www.industry.gov.lk/web/,found,theekshana.lk
+Ministry,"Ministry of Trade, Commerce, Food Security and Cooperative Development",ment.gov.lk,,unreachable,Failed to fetch page
+Ministry,Ministry of Environment,env.gov.lk,https://env.gov.lk/web/index.php?lang=en,found,Procons Infotech.
+Ministry,Ministry of Energy,energy.gov.lk,,unknown,
+Ministry,"Ministry of Housing, Construction and Water Supply",housingmin.gov.lk,,unreachable,Failed to fetch page
+Ministry,Ministry of Labor,labourmin.gov.lk,,unknown,
+Ministry,Ministry of Plantation and Community Infrastructure,plantationindustries.gov.lk,,found,University of Kelaniya
+Ministry,Ministry of Ports and Civil Aviation,portaviation.gov.lk,,unreachable,Failed to fetch page
+Ministry,"Ministry of Fisheries, Aquatic and Ocean Resources",fisheries.gov.lk,,self_built,IT UNIT Last Update
+Ministry,Ministry of Women and Child Affairs,childwomen.gov.lk,,unreachable,Failed to fetch page
+Ministry,"Ministry of Rural Development, Social Security and Community Empowerment",socialservices.gov.lk,https://socialservices.gov.lk/web/index.php?lang=en,found,Procons Infotech
+Ministry,"Ministry of Buddhasasana, Religious and Cultural Affairs",mbra.gov.lk,,unreachable,Failed to fetch page
+Ministry,Ministry of Youth Affairs and Sports,sportsmin.gov.lk,,unreachable,Failed to fetch page
+Ministry,Ministry of Science and Technology,most.gov.lk,https://most.gov.lk/web/index.php?lang=en,found,Procons Infotech
+Department,Department of Immigration and Emigration,immigration.gov.lk,https://immigration.gov.lk/index_e.php,found,SLT
+Department,Department of Motor Traffic,dmt.gov.lk,,found,Procons Infotech
+Department,Department of Registration of Persons,drp.gov.lk,https://drp.gov.lk/en/home.php,unknown,
+Department,Department of Registrar General,rgd.gov.lk,https://rgd.gov.lk/web/index.php?lang=en,unknown,
+Department,Department of Inland Revenue,ird.gov.lk,,unreachable,Failed to fetch page
+Department,Sri Lanka Customs,customs.gov.lk,,unknown,
+Department,Department of Pensions,pensions.gov.lk,,found,Procons Infotech
+Department,Department of Census and Statistics,statistics.gov.lk,,unreachable,Failed to fetch page
+Department,Department of Government Information,dgi.gov.lk,,unknown,
+Department,Department of Government Printing,documents.gov.lk,,unknown,
+Department,Department of Excise,excise.gov.lk,,found,LankaCom
+Department,Department of National Budget,nationalbudget.gov.lk,,unreachable,Failed to fetch page
+Department,Department of Meteorology,meteo.gov.lk,,unknown,
+Department,Department of Wildlife Conservation,dwc.gov.lk,,unreachable,Failed to fetch page
+Department,Department of Forest Conservation,forestdept.gov.lk,,found,ICTA & Procons Infotech
+Department,Department of National Zoological Gardens,colombozoo.gov.lk,,unreachable,Failed to fetch page
+Department,Department of Examinations,doenets.lk,,unknown,
+Department,Department of Archaeology,archaeology.gov.lk,,found,University of Kelaniya
+Department,Department of Samurdhi,samurdhi.gov.lk,https://samurdhi.gov.lk/web/index.php?lang=en,found,Information and Communication Technology Agency
+Department,LSF,opensource.lk,,unknown,
+Expired,Expired SSL,expired.badssl.com,,unknown,
+Self-Signed,Self-Signed SSL,self-signed.badssl.com,,unknown,
+Wrong Host,Wrong Host SSL,wrong.host.badssl.com,,unknown,
+Never SSL,Never SSL,neverssl.com,,unknown,
